@@ -2,7 +2,9 @@
 
 A full-stack web application that recommends Visa Product Design System (PDS) components using rule-based matching and OpenAI API integration.
 
-**Live Demo:** [component-suggestion-uiux-v9ya.vercel.app](https://component-suggestion-uiux-v9ya.vercel.app/)  
+I built a full-stack application with a React 19 + TypeScript frontend and an Express.js + OpenAI-powered backend. On the frontend, I created an interactive UI where users can input design prompts, upload frontend files, and receive component suggestions through either rule-based keyword matching or AI integration. I implemented a typewriter effect, live JSX preview using react-live, and dark mode support with TailwindCSS and Visa’s Nova Design System. On the backend, I developed a Node.js Express server that serves a mock dataset of Visa components via /api/components, and processes AI suggestions via /api/suggest by sending user input to OpenAI’s GPT-3.5 model and formatting the response as structured JSON. The backend includes fallback parsing logic, server-side logging of AI responses, and returns clean JSX component suggestions for real-time rendering on the frontend.
+
+**Live Demo:** [https://component-suggestion-uiux-marin.vercel.app/](https://component-suggestion-uiux-marin.vercel.app/)  
 _Note: Backend cold start may take ~50 seconds_
 
 ## ⚙️ Tech Stack
@@ -41,12 +43,6 @@ npm run dev                    # Terminal 2
 **Backend Safety:** API key protection with structured JSON responses from OpenAI  
 **Mock Data:** Curated dataset simulating real Visa PDS components
 
-## 📝 Example Usage
-
-**Text Input:** "Password input field with show/hide option"  
-**Button:** "Clickable button to add an item to cart"  
-**Checkbox:** "Remember me checkbox below login form"
-
 ## 📎 Recent Updates (08.01.2025)
 
 Added comprehensive file attachment system with:
@@ -60,22 +56,9 @@ Enhanced Background Animation System:
 
 Implemented a dynamic background system using pure CSS that combines hue-shifting, blur, and opacity breathing effects. The animation uses GPU-accelerated filter and transform properties to smoothly rotate colors, apply a soft blur (2–5px), and modulate transparency over time—all while adapting to light and dark mode themes. The gradient is rendered behind all content (z-index: -1) with pointer-events: none to ensure performance and non-intrusiveness, delivering an ambient, responsive visual experience without JavaScript.
 
+Intelligent Autocomplete System: 
 
----
-
-### Backend Architecture
-
-#### - **Backend-Orchestrated AI Calls**
-
-I chose to handle OpenAI API calls on the backend (Node.js Express) to protect sensitive API keys and validate AI responses before exposing them to the frontend. This architecture also gave me flexibility for future enhancements like caching or request throttling.
-
-#### - **Mock Dataset Integration**
-
-Given that the real Visa PDS components are behind internal access walls, I created a mock dataset (`components.json`) to replicate realistic component suggestions. This allowed me to demonstrate both keyword matching and AI-driven suggestions without scraping or unauthorized access.
-
-#### - **Validation Strategy for AI Output**
-
-I designed the system to optionally validate AI-suggested components against my known mock dataset before rendering. While basic checks were implemented, I noted this as an area for future development, especially for enterprise use cases where hallucination prevention is critical.
+I implemented an intelligent autocomplete system that saves user input history to localStorage and provides real-time suggestions as they type in the text box. The system filters through previously entered queries to show relevant suggestions below the textarea, allowing users to quickly reuse or modify past successful searches using keyboard navigation (arrow keys, Enter) or mouse clicks. This feature enhances user experience by reducing repetitive typing and helping users discover effective prompts they've used before, while automatically building a personalized suggestion database of up to 50 recent entries.
 
 ---
 

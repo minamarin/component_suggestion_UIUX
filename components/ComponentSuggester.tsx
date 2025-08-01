@@ -45,6 +45,12 @@ const ComponentSuggester = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
+  // ✅ Autocomplete functionality
+  const [inputHistory, setInputHistory] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+
   // ✅ Fetch components.json from backend
   useEffect(() => {
     // .get('http://localhost:4000/api/components')
@@ -52,6 +58,19 @@ const ComponentSuggester = () => {
       .get('https://visa-component-backend-1.onrender.com/api/components')
       .then((res) => setComponents(res.data))
       .catch((err) => console.error('Failed to fetch components:', err));
+  }, []);
+
+  // ✅ Load input history from localStorage on component mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('componentSuggesterHistory');
+    if (savedHistory) {
+      try {
+        const parsedHistory = JSON.parse(savedHistory);
+        setInputHistory(parsedHistory);
+      } catch (error) {
+        console.error('Failed to parse input history:', error);
+      }
+    }
   }, []);
 
   // ✅ Typewriter effect
@@ -73,12 +92,104 @@ const ComponentSuggester = () => {
     }
   }, [charIndex, currentPhraseIndex]);
 
+  // ✅ Handle input changes with autocomplete
+  const handleInputChange = (value: string) => {
+    setInput(value);
+    
+    if (value.trim().length > 0) {
+      // Filter suggestions based on input history and current input
+      const filteredSuggestions = inputHistory
+        .filter(historyItem => 
+          historyItem.toLowerCase().includes(value.toLowerCase()) && 
+          historyItem !== value
+        )
+        .slice(0, 5); // Limit to 5 suggestions
+      
+      // Also add some default suggestions if no history exists
+      const defaultSuggestions = [
+        'Password input field with show/hide option',
+        'Clickable button to add an item to cart',
+        'Remember me checkbox below login form',
+        'Search input with autocomplete',
+        'Toggle switch for settings'
+      ].filter(suggestion => 
+        suggestion.toLowerCase().includes(value.toLowerCase()) && 
+        suggestion !== value &&
+        !filteredSuggestions.includes(suggestion)
+      ).slice(0, 5 - filteredSuggestions.length);
+      
+      const allSuggestions = [...filteredSuggestions, ...defaultSuggestions];
+      setSuggestions(allSuggestions);
+      setShowSuggestions(allSuggestions.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+    setSelectedSuggestionIndex(-1);
+  };
+
+  // ✅ Save input to history
+  const saveToHistory = (inputText: string) => {
+    if (inputText.trim().length === 0) return;
+    
+    const updatedHistory = [
+      inputText,
+      ...inputHistory.filter(item => item !== inputText)
+    ].slice(0, 50); // Keep only last 50 entries
+    
+    setInputHistory(updatedHistory);
+    localStorage.setItem('componentSuggesterHistory', JSON.stringify(updatedHistory));
+  };
+
+  // ✅ Handle keyboard navigation for suggestions
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showSuggestions) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+        break;
+      case 'Enter':
+        if (selectedSuggestionIndex >= 0) {
+          e.preventDefault();
+          setInput(suggestions[selectedSuggestionIndex]);
+          setShowSuggestions(false);
+          setSelectedSuggestionIndex(-1);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+    }
+  };
+
+  // ✅ Select suggestion
+  const selectSuggestion = (suggestion: string) => {
+    setInput(suggestion);
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
+  };
+
   // ✅ Local keyword-based suggestion
   const handleSuggest = () => {
     if (input.length > 500) {
       alert('word count exceeded');
       return;
     }
+    
+    // Save input to history
+    saveToHistory(input);
+    
     const lowerInput = input.toLowerCase();
     const matches = components.filter((component) =>
       component.keywords.some((keyword) => lowerInput.includes(keyword))
@@ -104,6 +215,10 @@ const ComponentSuggester = () => {
       alert('word count exceeded');
       return;
     }
+    
+    // Save input to history
+    saveToHistory(input);
+    
     try {
       const res = await axios.post(
         'https://visa-component-backend-1.onrender.com/api/suggest',
@@ -391,7 +506,17 @@ const ComponentSuggester = () => {
             <textarea
               placeholder={typedText}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={() => {
+                // Delay hiding suggestions to allow clicks
+                setTimeout(() => setShowSuggestions(false), 150);
+              }}
+              onFocus={() => {
+                if (input.trim().length > 0 && suggestions.length > 0) {
+                  setShowSuggestions(true);
+                }
+              }}
               className='responsive-textarea'
               style={{
                 width: '100%',
@@ -411,6 +536,45 @@ const ComponentSuggester = () => {
                 boxSizing: 'border-box',
               }}
             />
+
+            {/* Autocomplete suggestions dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  right: '0',
+                  backgroundColor: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  zIndex: 1000,
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  marginTop: '0.25rem',
+                }}
+              >
+                {suggestions.map((suggestion, index) => (
+                  <div
+                    key={suggestion}
+                    onClick={() => selectSuggestion(suggestion)}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      cursor: 'pointer',
+                      borderBottom: index < suggestions.length - 1 ? '1px solid #f3f4f6' : 'none',
+                      backgroundColor: selectedSuggestionIndex === index ? '#f3f4f6' : 'white',
+                      fontSize: '0.9rem',
+                      color: '#374151',
+                      transition: 'background-color 0.2s ease',
+                    }}
+                    onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                  >
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Attachment icon positioned inside textarea at top-right */}
             <div
