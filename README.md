@@ -131,7 +131,7 @@ I designed the system to optionally validate AI-suggested components against my 
 
 ## Deployment
 
-Vercel Deployment Link (Full Stack -- Backend on Render): https://component-suggestion-uiux-v9ya.vercel.app/
+Vercel Deployment Link (Full Stack -- Backend on Render): https://component-suggestion-uiux-marin.vercel.app/
 OPENAI backend to connect with Frontend might take about 50seconds!
 
 ## Example Prompts
