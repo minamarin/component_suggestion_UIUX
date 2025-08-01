@@ -10,6 +10,17 @@ body,
   width: 100vw;
   min-height: 100vh;
   background: transparent !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode styles */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #111827;
+  color: #f9fafb;
 }
 
 /* Translucent pink-to-blue diagonal background effect */
@@ -25,6 +36,16 @@ body,
     rgba(0, 128, 255, 0.18) 100%
   );
   pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+/* Dark mode background gradient */
+.dark .background-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 69, 19, 0.25) 0%,
+    rgba(30, 41, 59, 0.35) 100%
+  );
 }
 
 .background-image {

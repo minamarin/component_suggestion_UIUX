@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@visa/nova-react';
-import { VisaCopyLow } from '@visa/nova-icons-react';
+import { VisaCopyLow, VisaAttachmentTiny } from '@visa/nova-icons-react';
 import axios from 'axios';
 import ComponentPreview from './ComponentPreview';
 import { ClickableMessageCard } from './MessageComponent';
@@ -42,10 +42,11 @@ const ComponentSuggester = () => {
   const [aiComponentName, setAiComponentName] = useState('');
   const [aiComponentCode, setAiComponentCode] = useState('');
   const [previewCode, setPreviewCode] = useState('');
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
   // ✅ Fetch components.json from backend
   useEffect(() => {
-    axios;
     // .get('http://localhost:4000/api/components')
     axios
       .get('https://visa-component-backend-1.onrender.com/api/components')
@@ -137,6 +138,31 @@ const ComponentSuggester = () => {
     }
   };
 
+  // ✅ Handle file upload
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length > 0) {
+      setAttachedFiles((prev) => [...prev, ...files]);
+      console.log(
+        'Files attached:',
+        files.map((f) => f.name)
+      );
+    }
+    // Reset the input value to allow selecting the same file again
+    event.target.value = '';
+  };
+
+  const removeAttachedFile = (fileToRemove: File) => {
+    setAttachedFiles((prev) => prev.filter((file) => file !== fileToRemove));
+  };
+
+  const triggerFileUpload = () => {
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
   return (
     <div
       style={{
@@ -148,6 +174,16 @@ const ComponentSuggester = () => {
         textAlign: 'center',
       }}
     >
+      {/* Hidden file input */}
+      <input
+        id='fileInput'
+        type='file'
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+        accept='.js,.jsx,.ts,.tsx,.html,.css,.json,.md,.txt,.py,.java,.cpp,.c,.php,.rb,.go,.rs,.swift,.kt'
+        multiple
+      />
+
       <div
         style={{
           display: 'flex',
@@ -158,17 +194,7 @@ const ComponentSuggester = () => {
           maxWidth: '600px',
           margin: '0 auto',
         }}
-      >
-        {/* <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
-          {input.length}/500
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <Button onClick={handleSuggest}>✨ Suggest Components</Button>
-          <Button alternate onClick={fetchAISuggestion}>
-            💡 Suggest with AI
-          </Button>
-        </div> */}
-      </div>
+      ></div>
 
       {/* Chat box: suggestion cards above, textarea and buttons at the bottom */}
       <div
@@ -303,26 +329,210 @@ const ComponentSuggester = () => {
         </div>
         {/* Textarea and buttons at the bottom */}
         <div style={{ width: '100%' }}>
-          <textarea
-            placeholder={typedText}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className='responsive-textarea'
-            style={{
-              width: '100%',
-              maxWidth: '900px',
-              minHeight: '100px',
-              padding: '1.5rem',
-              fontSize: '1.1rem',
-              border: '2px solid #e5e7eb',
-              borderRadius: '12px',
-              outline: 'none',
-              resize: 'vertical',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.07)',
-              marginBottom: '0.5rem',
-              boxSizing: 'border-box',
-            }}
-          />
+          {/* Attached files display */}
+          {attachedFiles.length > 0 && (
+            <div
+              style={{
+                marginBottom: '1rem',
+                padding: '0.5rem',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px solid #e5e7eb',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '0.9rem',
+                  fontWeight: 'bold',
+                  marginBottom: '0.5rem',
+                  color: '#374151',
+                }}
+              >
+                Attached Files ({attachedFiles.length}):
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {attachedFiles.map((file, index) => (
+                  <div
+                    key={`${file.name}-${index}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.25rem 0.5rem',
+                      backgroundColor: '#e5e7eb',
+                      borderRadius: '4px',
+                      fontSize: '0.8rem',
+                      border: '1px solid #d1d5db',
+                    }}
+                  >
+                    <span>{file.name}</span>
+                    <button
+                      onClick={() => removeAttachedFile(file)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#6b7280',
+                        fontSize: '1rem',
+                        padding: '0',
+                        lineHeight: '1',
+                      }}
+                      title='Remove file'
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ position: 'relative', width: '100%' }}>
+            <textarea
+              placeholder={typedText}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className='responsive-textarea'
+              style={{
+                width: '100%',
+                maxWidth: '100%',
+                minWidth: '200px',
+                minHeight: '100px',
+                maxHeight: '300px',
+                padding: '1.5rem',
+                paddingRight: '3.5rem', // Extra space for attachment icon
+                fontSize: '1.1rem',
+                border: '2px solid #e5e7eb',
+                borderRadius: '12px',
+                outline: 'none',
+                resize: 'both',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.07)',
+                marginBottom: '0.5rem',
+                boxSizing: 'border-box',
+              }}
+            />
+
+            {/* Attachment icon positioned inside textarea at top-right */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                display: 'inline-block',
+              }}
+              onMouseEnter={() => setShowUploadModal(true)}
+              onMouseLeave={() => setShowUploadModal(false)}
+            >
+              <button
+                type='button'
+                onClick={() => {
+                  console.log('Attachment button clicked');
+                  triggerFileUpload();
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '0.5rem',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 0.2s ease',
+                  width: '36px',
+                  height: '36px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                aria-label='Attach file'
+              >
+                <VisaAttachmentTiny
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    color: '#6b7280',
+                  }}
+                />
+              </button>
+
+              {/* Upload Modal */}
+              {showUploadModal && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '3rem',
+                    right: '0',
+                    background: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    padding: '1rem',
+                    zIndex: 1000,
+                    minWidth: '200px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem',
+                  }}
+                  onMouseEnter={() => setShowUploadModal(true)}
+                  onMouseLeave={() => setShowUploadModal(false)}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: '0.9rem',
+                      color: '#374151',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Do you want to attach files? “Suggest with AI” will scan
+                    uploaded front-end files, recommend relevant VPDS
+                    components, and offer refactored versions.
+                  </p>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '0.5rem',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Button
+                      onClick={() => {
+                        console.log('User clicked Yes');
+                        setShowUploadModal(false);
+                        triggerFileUpload();
+                      }}
+                      style={{
+                        fontSize: '0.8rem',
+                        padding: '0.4rem 0.8rem',
+                        minWidth: 'auto',
+                      }}
+                    >
+                      Yes
+                    </Button>
+                    <Button
+                      alternate
+                      onClick={() => {
+                        console.log('User clicked No');
+                        setShowUploadModal(false);
+                      }}
+                      style={{
+                        fontSize: '0.8rem',
+                        padding: '0.4rem 0.8rem',
+                        minWidth: 'auto',
+                      }}
+                    >
+                      No
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div
             style={{ fontSize: '0.8rem', color: '#9ca3af', margin: '0.5rem 0' }}
           >
@@ -334,10 +544,20 @@ const ComponentSuggester = () => {
               flexDirection: 'row',
               gap: '1rem',
               alignItems: 'center',
+              justifyContent: 'center',
               marginTop: '0.5rem',
             }}
           >
-            <Button onClick={handleSuggest}> Suggest Components</Button>
+            <Button
+              onClick={handleSuggest}
+              disabled={attachedFiles.length > 0}
+              style={{
+                opacity: attachedFiles.length > 0 ? 0.5 : 1,
+                cursor: attachedFiles.length > 0 ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Suggest Components
+            </Button>
             <Button alternate onClick={fetchAISuggestion}>
               Suggest with AI
             </Button>
