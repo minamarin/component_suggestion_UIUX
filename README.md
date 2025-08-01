@@ -1,10 +1,8 @@
 # Visa Component Suggestion Tool
 
-A full-stack web application that recommends Visa Product Design System (PDS) components using rule-based matching and OpenAI API integration.
+Built a full-stack application with a React 19 + TypeScript frontend and an Express.js + OpenAI-powered backend. On the frontend, I created an interactive UI where users can input design prompts, upload frontend files, and receive component suggestions through either rule-based keyword matching or AI integration. I implemented a typewriter effect, live JSX preview using react-live, and dark mode support with TailwindCSS and Visa’s Nova Design System. On the backend, I developed a Node.js Express server that serves a mock dataset of Visa components via /api/components, and processes AI suggestions via /api/suggest by sending user input to OpenAI’s GPT-3.5 model and formatting the response as structured JSON. The backend includes fallback parsing logic, server-side logging of AI responses, and returns clean JSX component suggestions for real-time rendering on the frontend.
 
-I built a full-stack application with a React 19 + TypeScript frontend and an Express.js + OpenAI-powered backend. On the frontend, I created an interactive UI where users can input design prompts, upload frontend files, and receive component suggestions through either rule-based keyword matching or AI integration. I implemented a typewriter effect, live JSX preview using react-live, and dark mode support with TailwindCSS and Visa’s Nova Design System. On the backend, I developed a Node.js Express server that serves a mock dataset of Visa components via /api/components, and processes AI suggestions via /api/suggest by sending user input to OpenAI’s GPT-3.5 model and formatting the response as structured JSON. The backend includes fallback parsing logic, server-side logging of AI responses, and returns clean JSX component suggestions for real-time rendering on the frontend.
-
-**Live Demo:** [https://component-suggestion-uiux-marin.vercel.app/](https://component-suggestion-uiux-marin.vercel.app/)  
+**Live Demo:** (Full Stack -- Backend on Render)[https://component-suggestion-uiux-marin.vercel.app/](https://component-suggestion-uiux-marin.vercel.app/)  
 _Note: Backend cold start may take ~50 seconds_
 
 ## ⚙️ Tech Stack
@@ -74,28 +72,25 @@ I implemented an intelligent autocomplete system that saves user input history t
 
 ## Next Steps (If More Time):
 
+### � Security & Validation
+
+- **Stricter Validation for AI Suggestions**: Cross-reference AI outputs with mock dataset or Nova component scope before previewing to prevent hallucinated or invalid JSX from being rendered, which is critical for enterprise trust and safe UX
+- **File Type Validation and Malware Scanning**: Restrict allowed MIME types and integrate malware scanning tools (e.g., file-type or third-party APIs like VirusTotal) to address security risks from file uploads
+
 ### 🧪 Testing & Quality
 
-- Unit tests for backend routes with Jest/Supertest, ensuring stability and correctness in the OpenAI integration and component suggestion routes
-- End-to-end testing with Playwright for user workflows (file upload → AI suggestion → preview)
+- **Unit and End-to-End Testing**: Use Jest and Supertest for backend route coverage and Playwright to simulate real user flows (file upload → AI suggestion → live preview) to ensure reliability and prevent regressions as you scale
 - Performance testing for AI response times and concurrent user handling
-
-### 🔒 Security & Validation
-
-- Implement stricter validation for AI suggestions by cross-checking AI responses with the mock dataset or Nova React component scope before live rendering
-- Add file type validation and malware scanning for uploaded files
-- Rate limiting and request throttling to prevent API abuse
 
 ### ⚡ Performance & Scalability
 
-- Implement caching (e.g., with Redis or in-memory caching) for repeated AI prompt results to reduce API calls and improve response speed
+- **Caching AI Responses**: Implement a caching layer using Redis or in-memory storage keyed by a hash of the prompt to reduce OpenAI API usage, speed up repeat queries, and improve user experience
 - Add streaming responses for real-time AI suggestion generation
 - Optimize bundle size and implement code splitting for faster load times
 
 ### 🚀 DevOps & Infrastructure
 
-- Containerize the backend with Docker and set up proper CI/CD workflows via GitHub Actions for deployments to Render or Railway
-- Add monitoring and logging with tools like Sentry or LogRocket
+- **CI/CD with Monitoring**: Containerize the backend with Docker, configure GitHub Actions for CI/CD, and add monitoring/logging tools like Sentry or LogRocket to automate deployments and provide visibility into production issues
 - Implement health checks and graceful shutdown handling
 
 ### ✨ Enhanced Features
@@ -105,17 +100,6 @@ I implemented an intelligent autocomplete system that saves user input history t
 - Export functionality to generate complete component libraries
 - Integration with design tools (Figma plugin, Sketch extension)
 - Multi-language support for international Visa teams
-
-### 📊 Analytics & Insights
-
-- Usage analytics to track most requested component types
-- A/B testing framework for suggestion accuracy improvements
-- User feedback collection and suggestion quality scoring
-
-## Deployment
-
-Vercel Deployment Link (Full Stack -- Backend on Render): https://component-suggestion-uiux-marin.vercel.app/
-OPENAI backend to connect with Frontend might take about 50seconds!
 
 ## Example Prompts
 
