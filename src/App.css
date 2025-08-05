@@ -1,3 +1,9 @@
+
+/*REGARDING 'em' : Sets the logo height to 6 times the current font size (em units are relative to font size)
+If the font size is 16px, this would be 96px tall
+HOWEVER THIS IS ALL VITE'S BOILER PLATE STYLING, NO NEED TO TOUCH, SAFE TO REMOVE*/
+
+
 #root {
   max-width: 1280px;
   margin: 0 auto;

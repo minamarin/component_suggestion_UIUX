@@ -1,4 +1,5 @@
 import React from 'react';
+//react-live: Enables live JSX editing and previewing.
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 import * as VisaComponents from '@visa/nova-react';
 
@@ -16,6 +17,8 @@ function extractComponentNames(code: string): string[] {
 
 // Utility: extract all handler names like onClick={handleAddToCart}
 function extractHandlerNames(code: string): string[] {
+  //This function uses RegEx to find component tags like <Button />, <TextInput>, etc., by looking for capitalized JSX tags.
+  //It returns an array of component names used in the input code (like Button, Checkbox, etc.).
   const regex = /on\w+\s*=\s*{\s*([a-zA-Z0-9_]+)\s*}/g;
   const names = new Set<string>();
   let match;
@@ -25,7 +28,9 @@ function extractHandlerNames(code: string): string[] {
   return Array.from(names);
 }
 
+//Takes in a string of JSX code and renders it interactively using react-live.
 const ComponentPreview = ({ code }: { code: string }) => {
+  //Wraps the JSX with a <div> to ensure valid React structure.
   const wrappedCode = `<><div style={{margin:'1rem', padding:'1rem'}}>${code}</div></>`;
   const usedComponents = extractComponentNames(code);
   const available = Object.keys(VisaComponents);
@@ -66,5 +71,11 @@ const ComponentPreview = ({ code }: { code: string }) => {
     </LiveProvider>
   );
 };
+
+//	•	LiveProvider: Provides the execution environment.
+// •	LivePreview: Shows the output (rendered JSX).
+// •	LiveEditor: Lets the user edit JSX live.
+// •	LiveError: Shows runtime or syntax errors from the JSX.
+
 
 export default ComponentPreview;

@@ -1,3 +1,15 @@
+/*
+ComponentSuggester.tsx
+------------------------
+A React component that allows users to describe a UI they'd like to build and receive relevant Visa design system components as suggestions. These suggestions come from either:
+1. Local keyword matching against a component list
+2. AI-generated suggestions via an external backend API
+
+It also includes typewriter-style placeholder UX, chat history, code copy-to-clipboard, file attachment previews, and a live component preview.
+*/
+
+
+// Import necessary React hooks and dependencies
 import { useState, useEffect } from 'react';
 import { Button } from '@visa/nova-react';
 import { VisaCopyLow, VisaAttachmentTiny } from '@visa/nova-icons-react';
@@ -5,18 +17,16 @@ import axios from 'axios';
 import ComponentPreview from './ComponentPreview';
 import { ClickableMessageCard } from './MessageComponent';
 
+//TYPE DEFINITIONS: Structure for component data from backend
+// Define TypeScript type for individual component suggestion
+// Contains name, description, keywords, and code snippet string
+// used for local suggestions
 type ComponentType = {
   name: string;
   description: string;
   keywords: string[];
   codeSnippet: string;
 };
-
-// 🟡 Extract JSX code from OpenAI response
-// const extractJSX = (aiText: string): string => {
-//   const match = aiText.match(/```(?:jsx)?([\s\S]*?)```/);
-//   return match ? match[1].trim() : '';
-// };
 
 // ✅ Typewriter placeholder phrases
 const phrases = [
@@ -25,6 +35,28 @@ const phrases = [
   'What would you like to create today?',
   'Start typing to discover relevant Visa components…',
 ];
+
+
+/*
+    ====== STATE OVERVIEW ======
+    input: string = current user input
+    chatHistory: any[] = chronological messages, includes AI/local entries
+    components: ComponentType[] = all components fetched from backend
+    copied: string|null = track what snippet was copied (for UI feedback)
+
+    === Typewriter placeholder ===
+    typedText: string = current visible placeholder animation
+    charIndex: number = where we are in the current phrase
+    currentPhraseIndex: number = which phrase in phrases[] is active
+
+    === AI Response ===
+    aiComponentName/code = the AI-suggested component (for live preview)
+
+    === Autocomplete ===
+    inputHistory: previous user inputs saved to localStorage
+    suggestions: current matching autocomplete options
+    selectedSuggestionIndex: which suggestion is highlighted
+*/
 
 const ComponentSuggester = () => {
   const [input, setInput] = useState('');
