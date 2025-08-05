@@ -2,7 +2,7 @@
 
 Built a full-stack application with a React 19 + TypeScript frontend and an Express.js + OpenAI-powered backend. On the frontend, I created an interactive UI where users can input design prompts, upload frontend files, and receive component suggestions through either rule-based keyword matching or AI integration. I implemented a typewriter effect, live JSX preview using react-live, and dark mode support with TailwindCSS and Visa’s Nova Design System. On the backend, I developed a Node.js Express server that serves a mock dataset of Visa components via /api/components, and processes AI suggestions via /api/suggest by sending user input to OpenAI’s GPT-3.5 model and formatting the response as structured JSON. The backend includes fallback parsing logic, server-side logging of AI responses, and returns clean JSX component suggestions for real-time rendering on the frontend.
 
-**Live Demo:** (Full Stack -- Backend on Render)[https://component-suggestion-uiux-marin.vercel.app/](https://component-suggestion-uiux-marin.vercel.app/)  
+**Live Demo:** (Full Stack -- Backend on Render)[https://component-suggestion-uiux-f7ef.vercel.app/](https://component-suggestion-uiux-f7ef.vercel.app/)  
 _Note: Backend cold start may take ~50 seconds_
 
 ## ⚙️ Tech Stack
